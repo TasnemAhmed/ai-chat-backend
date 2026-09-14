@@ -1,6 +1,6 @@
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base
+from sqlalchemy.orm import Mapped, mapped_column,relationship
 
 
 class Message(Base):
@@ -12,3 +12,6 @@ class Message(Base):
     )
     role: Mapped[str]
     content: Mapped[str]
+    conversation: Mapped["Conversation"] = relationship(
+    back_populates="messages"
+)

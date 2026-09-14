@@ -1,8 +1,10 @@
 from fastapi import FastAPI, HTTPException
 from sqlalchemy import select
-from app.models import User, Conversation
+from app.models import User, Conversation ,Message
 from app.schemas.conversation import ConversationCreate
 from app.database import SessionLocal, Base, engine
+from app.schemas.message import MessageCreate,MessageResponse
+
 
 from app.schemas.user import UserCreate
 
@@ -188,5 +190,44 @@ def get_user_conversations(user_id:int):
     ]
 
 
+@app.post("/conversations/{conversation_id}/messages")
+def add_message(conversation_id: int,message:MessageCreate):
+    db=SessionLocal()
+    conv=db.get(Conversation,conversation_id)
+    if conv is None:
+        db.close()
+        raise HTTPException(status_code=404, detail="Conversation not found")
 
-     #uvicorn app.main:app --reload
+    new_message = Message(
+        conversation_id=conversation_id,
+        role=message.role,
+        content=message.content
+    )
+
+    db.add(new_message)
+    db.commit()
+    db.refresh(new_message)
+
+    db.close()
+
+    return new_message
+
+@app.get("/conversations/{conversation_id}/messages", response_model=list[MessageResponse])
+def get_messages(conversation_id: int):
+
+    db = SessionLocal()
+
+    conversation = db.get(Conversation, conversation_id)
+
+    if conversation is None:
+        db.close()
+        raise HTTPException(status_code=404, detail="Conversation not found")
+
+    messages = db.scalars(
+        select(Message).where(Message.conversation_id == conversation_id)
+    ).all()
+
+    db.close()
+
+    return messages
+    #uvicorn app.main:app --reload

@@ -12,3 +12,6 @@ class Conversation(Base):
     user: Mapped["User"] = relationship(
     back_populates="conversations"
 )
+    messages: Mapped[list["Message"]] = relationship(
+        back_populates="conversation"
+    )
