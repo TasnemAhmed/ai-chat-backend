@@ -1,9 +1,15 @@
-from pydantic import BaseModel
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict ,Field
+from enum import Enum
+
+
+class MessageRole(str, Enum):
+    user = "user"
+    assistant = "assistant"
+
 
 class MessageCreate(BaseModel):
-    role:str
-    content:str
+    role:MessageRole
+    content:str = Field(min_length=1)
 
 class MessageResponse(BaseModel):
     id:int
