@@ -1,9 +1,12 @@
 from pwdlib import PasswordHash
 from jose import jwt
+import os
+from dotenv import load_dotenv
 
 password_hash = PasswordHash.recommended()
 
-SECRET_KEY = "your-secret-key"
+SECRET_KEY = os.getenv("SECRET_KEY")
+print("DEBUG SECRET_KEY:", SECRET_KEY)
 ALGORITHM = "HS256"
 
 
