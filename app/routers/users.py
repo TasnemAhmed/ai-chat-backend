@@ -18,10 +18,20 @@ router = APIRouter()
 # =========================
 # Public Endpoints
 # =========================
-
 @router.post("/users")
 def create_user(user_data: UserCreate):
     db = SessionLocal()
+
+    existing_user = db.query(User).filter(
+        User.email == user_data.email
+    ).first()
+
+    if existing_user:
+        db.close()
+        raise HTTPException(
+            status_code=400,
+            detail="Email already registered"
+        )
 
     user = User(
         name=user_data.name,
@@ -39,8 +49,6 @@ def create_user(user_data: UserCreate):
         "name": user.name,
         "email": user.email
     }
-
-
 @router.post("/login")
 def login(user_data: UserLogin):
     db = SessionLocal()

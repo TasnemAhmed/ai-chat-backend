@@ -25,29 +25,31 @@ st.markdown(
     <style>
 
     /* =====================================================
-       COLOR SYSTEM
-       ===================================================== */
+   COLOR SYSTEM
+   ===================================================== */
 
-    :root {
-        --navy: #102A43;
-        --navy-dark: #0B1F33;
-        --navy-light: #243B53;
+        :root {
+            --navy: #102A43;
+            --navy-dark: #0B1F33;
+            --navy-light: #243B53;
 
-        --blue: #007C91;
-        --blue-dark: #005F73;
-        --cyan: #7FDBDA;
+            /* ألوان أكثر وضوحاً وتباين مع النص الأبيض */
+            --blue: #005A9C;         /* أزرق واضح ومريح لعمى الألوان */
+            --blue-dark: #003A66;
+            --cyan: #7FDBDA;
 
-        --background: #F5F7FA;
-        --surface: #FFFFFF;
+            --background: #F5F7FA;
+            --surface: #FFFFFF;
 
-        --border: #D9E2EC;
-        --border-dark: #BCCCDC;
+            --border: #829AB1;       /* تغميق الحدود لتحديد الحقول بوضوح */
+            --border-dark: #627D98;
 
-        --text: #102A43;
-        --muted: #627D98;
+            --text: #102A43;
+            --muted: #486581;
 
-        --danger: #B42318;
-    }
+            --danger: #B42318;
+        }
+
 
 
     /* =====================================================
@@ -72,10 +74,46 @@ st.markdown(
         visibility: hidden;
     }
 
-    header {
+        /* 1. إظهار الهيدر */
+    header[data-testid="stHeader"] {
         background: transparent !important;
+        z-index: 999999 !important;
     }
 
+    /* 2. إجبار الزرار وكل الأيقونات والعناصر اللي جواه إنها تفضل ظاهرة 100% */
+    header[data-testid="stHeader"] button,
+    button[data-testid="stHeaderNavStateButton"],
+    button[aria-label="Expand sidebar"],
+    button[aria-label="Collapse sidebar"],
+    button[data-testid="stHeaderNavStateButton"] * {
+        visibility: visible !important;
+        opacity: 1 !important;
+        display: flex !important;
+    }
+
+    /* 3. تصميم الزرار بحيث يبان كـ Icon واضح جداً لخلفية فاتحة */
+    header[data-testid="stHeader"] button {
+        background-color: #102A43 !important; /* خلفية كحلي غمق */
+        border-radius: 8px !important;
+        padding: 6px !important;
+        margin: 8px !important;
+    }
+
+    /* 4. تغيير لون الأيقونة السهم نفسها للون الأبيض عشان تظهر بوضوح */
+    header[data-testid="stHeader"] button svg {
+        fill: #FFFFFF !important;
+        color: #FFFFFF !important;
+        stroke: #FFFFFF !important;
+        width: 20px !important;
+        height: 20px !important;
+    }
+
+    /* عند الوقوف على الزرار بالماوس */
+    header[data-testid="stHeader"] button:hover {
+        background-color: #005A9C !important;
+    }
+
+           
     h1,
     h2,
     h3,
@@ -97,7 +135,7 @@ st.markdown(
     .stTextArea label,
     .stFileUploader label {
         color: var(--text) !important;
-        font-weight: 600 !important;
+        font-weight: 700 !important;
     }
 
     .stTextInput input,
@@ -127,38 +165,50 @@ st.markdown(
     /* =====================================================
        BUTTONS
        ===================================================== */
+        .stButton > button {
+            min-height: 48px !important;
+            border-radius: 10px !important;
+            font-weight: 800 !important;
+            font-size: 16px !important;
+            border: 2px solid transparent !important;
+            transition: all 0.16s ease !important;
+        }
 
-    .stButton > button {
-        min-height: 43px;
+        /* إجبار النص وجميع المكونات داخل الزر على الظهور باللون الأبيض الناصع */
+        .stButton > button p,
+        .stButton > button span,
+        .stButton > button div {
+            color: #FFFFFF !important;
+            font-weight: 800 !important;
+            font-size: 16px !important;
+        }
 
-        border-radius: 10px;
+        /* الزر الأساسي (Primary Button) */
+        .stButton > button[kind="primary"],
+        .stButton > button {
+            background-color: var(--blue) !important;
+            color: #FFFFFF !important;
+            border-color: var(--blue) !important;
+        }
 
-        font-weight: 650;
+        .stButton > button:hover {
+            background-color: var(--blue-dark) !important;
+            border-color: var(--blue-dark) !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        }
 
-        transition:
-            transform 0.16s ease,
-            box-shadow 0.16s ease,
-            background-color 0.16s ease;
-    }
+        /* الزر الثانوي */
+        .stButton > button[kind="secondary"] {
+            background-color: #FFFFFF !important;
+            color: var(--navy) !important;
+            border: 2px solid var(--navy) !important;
+        }
 
-    .stButton > button:hover {
-        transform: translateY(-1px);
-    }
-
-    .stButton > button[kind="primary"] {
-        background: var(--blue);
-        border-color: var(--blue);
-        color: white;
-    }
-
-    .stButton > button[kind="primary"]:hover {
-        background: var(--blue-dark);
-        border-color: var(--blue-dark);
-
-        box-shadow:
-            0 6px 18px rgba(0, 95, 115, 0.18);
-    }
-
+        .stButton > button[kind="secondary"] p,
+        .stButton > button[kind="secondary"] span {
+            color: var(--navy) !important;
+        }
 
     /* =====================================================
        AUTH PAGES
@@ -491,7 +541,7 @@ def load_conversations():
     return False
 
 
-def create_new_conversation():
+def create_new_conversation(title="New conversation"):
 
     user_id = st.session_state.user["id"]
 
@@ -499,7 +549,7 @@ def create_new_conversation():
         f"{API_BASE_URL}/users/{user_id}/conversations",
         headers=get_headers(),
         json={
-            "title": "New conversation"
+            "title": title
         },
     )
 
@@ -570,17 +620,19 @@ def logout():
 def login_successfully():
 
     if not load_user():
-
-        st.error(
-            "Could not load your account."
-        )
-
+        st.error("Could not load your account.")
         return False
 
-    # Every login starts a NEW conversation.
-    if not create_new_conversation():
+    # جلب محادثات المستخدم السابقة
+    load_conversations()
 
-        return False
+    # لو عنده محادثات نفتح أحدث واحدة، لو معندوش نترك المعرف خالي ليتم إنشاؤها عند أول رسالة
+    if st.session_state.conversations:
+        latest_conv = st.session_state.conversations[-1]
+        load_messages(latest_conv["id"])
+    else:
+        st.session_state.conversation_id = None
+        st.session_state.messages = []
 
     st.session_state.page = "main"
 
@@ -1048,9 +1100,12 @@ elif st.session_state.page == "main":
 
         if new_chat:
 
-            if create_new_conversation():
+            # لا ننشئ Conversation في قاعدة البيانات بمجرد الضغط على
+            # "New conversation". ننتظر أول رسالة ثم ننشئها بعنوان الرسالة.
+            st.session_state.conversation_id = None
+            st.session_state.messages = []
 
-                st.rerun()
+            st.rerun()
 
         st.markdown(
             '<div class="sidebar-section">'
@@ -1082,14 +1137,11 @@ elif st.session_state.page == "main":
                     "Conversation",
                 )
 
-                if (
-                    not title
-                    or title == "New conversation"
-                ):
-
-                    title = (
-                        f"Conversation {conversation_id}"
-                    )
+                # المحادثات القديمة التي اتعملت تلقائياً بعنوان
+                # "New conversation" ممكن تكون Conversations فاضية من
+                # النسخة القديمة من الواجهة، لذلك لا نعرضها في الـ sidebar.
+                if not title or title == "New conversation":
+                    continue
 
                 is_current = (
                     conversation_id
@@ -1245,7 +1297,11 @@ elif st.session_state.page == "main":
     )
 
     if prompt:
-
+        if st.session_state.conversation_id is None:
+                generated_title = prompt[:30] + ("..." if len(prompt) > 30 else "")
+                
+                if not create_new_conversation(title=generated_title):
+                    st.stop()
         with st.chat_message(
             "user",
             avatar="👤",
@@ -1326,3 +1382,4 @@ elif st.session_state.page == "main":
                     "Something went wrong while contacting the assistant."
                 )
             )
+            #streamlit run frontend/streamlit_app.py

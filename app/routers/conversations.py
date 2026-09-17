@@ -62,8 +62,10 @@ def get_user_conversations(
             detail="User not found"
         )
 
-    conversations = user.conversations
-
+    conversations = [
+            conv for conv in user.conversations 
+            if len(conv.messages) > 0 or conv.title != "New conversation"
+        ]
     db.close()
 
     return [
